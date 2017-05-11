@@ -80,6 +80,7 @@
 			},
 			setCurrentCat : function(cat){
 				model.currentCat = cat;
+				this.cancelEdit();
 			},
 			updateClickedCount : function(){
 				model.currentCat.clickedCount += 1;
@@ -113,6 +114,10 @@
 				this.render();
 			},
 			render : function(){
+				// check init
+				if(! this.catListElem){
+					this.init();
+				}
 				var cat, cats, i, elem;
 				cats = octopus.getCats();
 				for(i = 0; i < cats.length; i++){
@@ -140,6 +145,10 @@
 				this.render();
 			},
 			render : function(){
+				// check init
+				if(! this.catNameElem){
+					this.init();
+				}
 				var currentCat = octopus.getCurrentCat();
 				this.clickedCountElem.value = currentCat.clickedCount;
 				this.catNameElem.value = currentCat.catName;
@@ -168,6 +177,10 @@
 				this.render();
 			},
 			render: function(){
+				// check init
+				if(! this.adminElem){
+					this.init();
+				}
 				var currentCat = octopus.getCurrentCat();
 				this.clickedCountElem.value = currentCat.clickedCount;
 				this.catNameElem.value = currentCat.catName;
