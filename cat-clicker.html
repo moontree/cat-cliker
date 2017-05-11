@@ -1,0 +1,184 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<ul id="cat-list"></ul>
+		<div id = "cat-detail">
+			<input id = 'cat-name'>
+			<img id = 'cat-url' src = ''>
+			<input id = 'clicked-count'>
+		</div>
+		<div id = 'cat-manage'>
+			<button id = 'admin'>admin</button>
+			<div id = 'detail-div' style = "display : none">
+				<ul id = 'total-detail'>
+					<li>
+						<label> Name </label>
+						<input id = 'editable-name'>
+					</li>
+					<li>
+						<label> url </label>
+						<input id = 'editable-url'>
+					</li>
+					<li>
+						<label> clicked-number </label>
+						<input id = 'editable-clicked-count'>
+					</li>
+				</ul>
+				<button id = 'save'>save</button>
+				<button id = 'cancel'>cancel</button>
+			</div>
+		</div>
+	</body>
+	<script src = 'jquery-3.2.1.min.js'></script>
+	<script>
+		var model = {
+			currentCat : null ,
+			adminStatus : false,
+			cats : [
+				{
+					catName : "cat1",
+					catImage : "img/cat1.jpg",
+					clickedCount : 0
+				},
+				{
+					catName : "cat2",
+					catImage : "img/cat2.jpg",
+					clickedCount : 0
+				},
+				{
+					catName : "cat3",
+					catImage : "img/cat3.jpg",
+					clickedCount : 0
+				},
+				{
+					catName : "cat4",
+					catImage : "img/cat4.jpg",
+					clickedCount : 0
+				},
+				{
+					catName : "cat5",
+					catImage : "img/cat5.jpg",
+					clickedCount : 0
+				}
+			]
+		};
+		var octopus = {
+			init : function(){
+				var cat = this.getCats()[0];
+				this.setCurrentCat(cat);
+
+				adminView.init();
+				catListView.init();
+				catDetailView.init();
+			},
+			getCats : function(){
+				return model.cats;
+			},
+			getCurrentCat : function(){
+				return model.currentCat;
+			},
+			setCurrentCat : function(cat){
+				model.currentCat = cat;
+			},
+			updateClickedCount : function(){
+				model.currentCat.clickedCount += 1;
+				catDetailView.render();
+				this.cancelEdit();
+			},
+			showAdminDiv : function(){
+				model.adminStatus = true;
+				adminView.render();
+			},
+			cancelEdit : function(){
+				model.adminStatus = false;
+				adminView.render();
+			},
+			confirmEdit : function(){
+				model.adminStatus = false;
+				var cat = this.getCurrentCat();
+				cat.catName = document.getElementById('editable-name').value;
+				cat.catImage = document.getElementById('editable-url').value;
+				cat.clickedCount = parseInt(document.getElementById('editable-clicked-count').value);
+				adminView.render();
+				catDetailView.render();
+			},
+			getAdminStatus : function(){
+				return model.adminStatus;
+			}
+		};
+		var catListView = {
+			init : function(){
+				this.catListElem = document.getElementById('cat-list');
+				this.render();
+			},
+			render : function(){
+				var cat, cats, i, elem;
+				cats = octopus.getCats();
+				for(i = 0; i < cats.length; i++){
+					elem = document.createElement('li');
+					cat = cats[i];
+					elem.textContent = cat.catName;
+					elem.addEventListener('click',(function(catCopy){
+						return function(){
+							octopus.setCurrentCat(catCopy);
+							catDetailView.render();
+						};
+					})(cat));
+					this.catListElem.appendChild(elem);
+				}
+			}
+		};
+		var catDetailView = {
+			init : function(){
+				this.catNameElem = document.getElementById('cat-name');
+				this.catImageElem = document.getElementById('cat-url');
+				this.clickedCountElem = document.getElementById('clicked-count');
+				this.catImageElem.addEventListener('click', function(){
+					octopus.updateClickedCount();
+				});
+				this.render();
+			},
+			render : function(){
+				var currentCat = octopus.getCurrentCat();
+				this.clickedCountElem.value = currentCat.clickedCount;
+				this.catNameElem.value = currentCat.catName;
+				this.catImageElem.src = currentCat.catImage;
+			}
+		};
+
+		var adminView = {
+			init: function () {
+				this.catNameElem = document.getElementById('editable-name');
+				this.catImageElem = document.getElementById('editable-url');
+				this.clickedCountElem = document.getElementById('editable-clicked-count');
+				this.adminElem = document.getElementById('admin');
+				this.cancelButtonElem = document.getElementById('cancel');
+				this.saveButtonElem = document.getElementById('save');
+				this.adminDivElem = document.getElementById('detail-div');
+				this.adminElem.addEventListener('click', function(){
+					octopus.showAdminDiv();
+				});
+				this.cancelButtonElem.addEventListener('click', function(){
+					octopus.cancelEdit();
+				});
+				this.saveButtonElem.addEventListener('click', function(){
+					octopus.confirmEdit();
+				});
+				this.render();
+			},
+			render: function(){
+				var currentCat = octopus.getCurrentCat();
+				this.clickedCountElem.value = currentCat.clickedCount;
+				this.catNameElem.value = currentCat.catName;
+				this.catImageElem.value = currentCat.catImage;
+				if (octopus.getAdminStatus()){
+					this.adminDivElem.style.display = 'block';
+				}else{
+					this.adminDivElem.style.display = 'none';
+				}
+			}
+		};
+		octopus.init();
+	</script>
+</html>
